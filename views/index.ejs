@@ -1,42 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OneToOneChat-application</title>
+  <title>Document</title>
+  <link href='https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css' rel='stylesheet' />
   <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
+
 <body>
-  <div class="main">
+  <main>
 
     <div class="left">
-      <div class="left-top">
-        <img src="https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="">
-        <h3>abc</h3>
-      </div>
-      <div class="left-bottom">
-        <div class="users">
-          <img src="https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="">
-        <h3>abc1</h3>
+      <div class="top">
+        <div class="user">
+          <img src="<%= user.profileImage %>" alt="">
+          <h1><%= user.username %></h1>
         </div>
+      </div>
+
+      <div class="bottom">
         <div class="users">
-          <img src="https://images.unsplash.com/photo-1599379126660-d10b7e1831c8?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="">
-        <h3>abc1</h3>
+
         </div>
       </div>
     </div>
     <div class="right">
-      <div class="right-top">
-        <img src="https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="">
-        <h3>abc</h3>
+      <div class="topUser">
+        <div class="user">
+          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzB8fG1vZGVsc3xlbnwwfHwwfHx8MA%3D%3D" alt="">
+          <div class="text">
+            <h1>Username</h1>
+            <small>Active now</small>
+          </div>
+        </div>
       </div>
-      <div class="right-bottom">
-        <input type="text">
-        <button>sent</button>
+      <div class="conversation">
+        <div class="messages">
+          <div class="message">
+            <img src="https://images.unsplash.com/photo-1622396636133-ba43f812bc35?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fG1vZGVsc3xlbnwwfHwwfHx8MA%3D%3D" alt="">
+            <p>Some message</p>
+          </div>
+          <div class="message">
+            <p>Some message</p>
+          </div>
+        </div>
+
+        <div class="inputs">
+          <input type="text" placeholder="Write your message">
+          <button><i class="ri-send-plane-line"></i></button>
+        </div>
       </div>
     </div>
 
-  </div>
-  
+  </main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js" integrity="sha512-JSCFHhKDilTRRXe9ak/FJ28dcpOJxzQaCd3Xg8MyF6XFjODhy/YMCM8HW0TFDckNHWUewW+kfvhin43hKtJxAw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    var socket = io();
+    var user = "<%= user.username %>"
+
+    socket.emit('join', user)
+
+    axios.get('/getOnlineUser').then(response => {
+      response.data.onlineUsers.forEach(onlineUser => {
+
+        appendNewChat(onlineUser.profileImage, onlineUser.username)
+
+      });
+    })
+
+
+    function appendNewChat(userImage, userName) {
+      const userTemplate = `
+       <div class="user">
+            <img src="${userImage}" alt="">
+            <h1>${userName}</h1>
+          </div>`
+
+      document.querySelector('.left .users').innerHTML += userTemplate
+    }
+
+
+    function appendIncomingMessage(userImage, message) {
+      const messageTemplate = `
+      <div class="message">
+            <img src="${userImage}" alt="">
+            <p>${message}</p>
+          </div>
+      `
+      document.querySelector('.messages').innerHTML += messageTemplate
+
+    }
+
+
+
+    document.querySelector('.inputs button').addEventListener('click', () => {
+
+      const message = document.querySelector('.inputs input').value
+
+      const messageTemplate = `
+      <div class="message">
+            <p>${message}</p>
+          </div>
+      `
+
+      document.querySelector('.messages').innerHTML += messageTemplate
+      document.querySelector('.inputs input').value = ""
+
+
+    })
+  </script>
 </body>
+
 </html>
